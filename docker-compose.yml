@@ -1,0 +1,63 @@
+version: '3.7'
+
+services:
+  bytesafe-ce:
+    image: bytesafe/bytesafe-ce:latest
+    restart: "no"
+    volumes:
+      - "bytesafe-blob-data:/var/lib/bytesafe"
+      - "bytesafe-tmp:/tmp"
+    ports:
+      - "8081:8081"
+    environment:
+      # Supply DATA_ENCRYPTION_KEY to docker compose through a .env file, i.e.:
+      # $ echo "DATA_ENCRYPTION_KEY=<your_data_encryption_key>" > .env
+      - DATA_ENCRYPTION_KEY # mandatory
+      - URL_PREFIX
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_USER
+      - SMTP_PASSWORD
+      - SMTP_FROM_ADDRESS
+      - TELEMETRY
+      - TELEMETRY_TAGS=docker,compose
+      - REDIS_HOST=redis
+      - DB_HOST=postgres
+    entrypoint: "/bytesafe-ce --setupdb"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  postgres:
+    image: postgres:13
+    restart: always
+    volumes:
+      - "bytesafe-postgres-data:/var/lib/postgresql/data"
+    ports:
+      - "5432"
+    environment:
+      POSTGRES_PASSWORD: pg123
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+      start_period: 20s
+
+  redis:
+    image: redis:6
+    restart: always
+    ports:
+      - "6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  bytesafe-postgres-data:
+  bytesafe-blob-data:
+  bytesafe-tmp:

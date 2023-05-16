@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx:1.21
+    ports:
+      - 8443:443
+    volumes:
+      - ./certs/:/etc/nginx/ssl
+      - ./conf.d/:/etc/nginx/conf.d
+    depends_on:
+      bytesafe-ce:
+        condition: service_started
