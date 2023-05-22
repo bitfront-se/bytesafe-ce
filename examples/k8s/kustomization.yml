@@ -1,0 +1,15 @@
+resources:
+- bytesafe-ce.yml
+
+namespace: bytesafe
+
+configMapGenerator:
+- name: bytesafe-config
+  literals:
+   - SMTP_USER=""
+   - SMTP_HOST=""
+   - SMTP_PORT=""
+   - REDIS_HOST=redis
+   - DB_HOST=postgres
+   - URL_PREFIX="http://localhost:8081"
+   - TELEMETRY="false"

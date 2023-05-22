@@ -18,9 +18,9 @@ spec:
           image: postgres:13
           ports:
             - containerPort: 5432
-          env:
-            - name: POSTGRES_PASSWORD
-              value: pg123
+          envFrom:
+            - secretRef:
+                name: postgres-password
           volumeMounts:
             - name: bytesafe-postgres-data
               mountPath: /var/lib/postgresql/data
@@ -138,28 +138,20 @@ spec:
             - name: bytesafe-data
               mountPath: /var/lib/bytesafe/blobs
           env:
-            - name: DATA_ENCRYPTION_KEY
-              value: ""
-            - name: URL_PREFIX
-              value: ""
-            - name: SMTP_HOST
-              value: ""
-            - name: SMTP_PORT
-              value: ""
-            - name: SMTP_USER
-              value: ""
-            - name: SMTP_PASSWORD
-              value: ""
-            - name: SMTP_FROM_ADDRESS
-              value: ""
-            - name: TELEMETRY
-              value: ""
             - name: TELEMETRY_TAGS
               value: "k8s"
-            - name: REDIS_HOST
-              value: "redis"
-            - name: DB_HOST
-              value: "postgres"
+          envFrom:
+            - configMapRef:
+                name: bytesafe-config
+            - secretRef:
+                name: data-encryption-key
+            - secretRef:
+                name: smtp-password
+                optional: true
+            - secretRef:
+                name: postgres-password
+
+
           args: ["--setupdb"]
           livenessProbe:
             tcpSocket:
@@ -192,6 +184,5 @@ spec:
   type: LoadBalancer
   ports:
     - port: 8081
-      targetPort: 8081
   selector:
     app: bytesafe-ce
