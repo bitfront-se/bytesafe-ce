@@ -23,6 +23,7 @@ services:
       - TELEMETRY_TAGS=docker,compose
       - REDIS_HOST=redis
       - DB_HOST=postgres
+      - ALLOW_PRIVATE_IPS=true
     entrypoint: "/bytesafe-ce --setupdb"
     depends_on:
       postgres:
