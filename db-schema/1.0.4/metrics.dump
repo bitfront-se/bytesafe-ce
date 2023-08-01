@@ -1,0 +1,107 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 13.5 (Debian 13.5-1.pgdg110+1)
+-- Dumped by pg_dump version 14.1 (Debian 14.1-1.pgdg110+1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: metrics; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.metrics (
+    account_id character varying(64) NOT NULL,
+    tm timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    name text NOT NULL,
+    value double precision NOT NULL,
+    dkey text NOT NULL,
+    dim_registry text,
+    dim_repository text,
+    dim_project text,
+    dim_severity text,
+    dim_type text
+);
+
+
+ALTER TABLE public.metrics OWNER TO postgres;
+
+--
+-- Data for Name: metrics; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Name: metrics metrics_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.metrics
+    ADD CONSTRAINT metrics_pkey PRIMARY KEY (account_id, name, tm, dkey);
+
+
+--
+-- Name: metrics_index_1; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX metrics_index_1 ON public.metrics USING btree (account_id, name, dkey, tm DESC, value);
+
+
+--
+-- Name: metrics_index_2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX metrics_index_2 ON public.metrics USING btree (account_id, name, dim_type, dkey, tm DESC, value);
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+GRANT USAGE ON SCHEMA public TO PUBLIC;
+GRANT USAGE ON SCHEMA public TO readonly;
+GRANT ALL ON SCHEMA public TO readwrite;
+
+
+--
+-- Name: TABLE metrics; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.metrics TO readonly;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.metrics TO readwrite;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT USAGE ON SEQUENCES  TO readwrite;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT ON TABLES  TO readonly;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT,INSERT,DELETE,UPDATE ON TABLES  TO readwrite;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
